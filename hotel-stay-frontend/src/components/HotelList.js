@@ -50,8 +50,8 @@ const HotelList = () => {
     };
 
     const getImageUrl = (pictureUrl) => {
-        // Convert local file paths to public URLs
-        return pictureUrl.replace(/C:\\Users\\arun\.kashyap\\hotel-stay-frontend\\src\\images\\/, '/images/');
+        // Assuming the pictures are stored in the public/images folder
+        return `${pictureUrl}`;
     };
 
     if (error) {
@@ -172,7 +172,7 @@ const HotelList = () => {
                                                 {hotel.room.$values.map(room => {
                                                     const discountedRate = room.rate - (room.rate * room.discountPercentage / 100);
                                                     const roomPictures = room.roomPicture.$values;
-                                                    const roomImage = roomPictures.length > 0 ? getImageUrl(roomPictures[0].pictureUrl) : 'https://via.placeholder.com/100x75?text=No+Image';
+                                                    const roomImage = roomPictures.length > 0 ? getImageUrl(roomPictures[0].pictureUrl) : '/images/placeholder.png'; // Placeholder image
 
                                                     return (
                                                         <li key={room.roomId} style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
