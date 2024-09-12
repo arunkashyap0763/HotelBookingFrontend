@@ -1,52 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchHotels, setFilteredHotels, setSearchTerm, setCheckInDate, setCheckOutDate, setGuests, setLoading, setError } from '../redux/slices/hotelSlice';
+
 
 const HotelList = () => {
-    const [hotels, setHotels] = useState([]);
-    const [filteredHotels, setFilteredHotels] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [checkInDate, setCheckInDate] = useState('');
-    const [checkOutDate, setCheckOutDate] = useState('');
-    const [guests, setGuests] = useState({ adults: 2, children: 0, rooms: 1 });
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
+    const { hotels, filteredHotels, searchTerm, checkInDate, checkOutDate, guests, error, loading } = useSelector(state => state.hotels);
 
     useEffect(() => {
-        const fetchHotels = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const response = await axios.get('https://localhost:7034/api/Hotels');
-                if (response.data && response.data.$values) {
-                    setHotels(response.data.$values);
-                    setFilteredHotels(response.data.$values);
-                } else {
-                    console.error('Unexpected data format:', response.data);
-                    setError('Unexpected data format from API');
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setError('Failed to fetch hotel data');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchHotels();
-    }, []);
+        dispatch(fetchHotels());
+    }, [dispatch]);
 
     const handleSearch = (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError(null);
+        dispatch(setLoading(true));
+        dispatch(setError(null));
 
         const filtered = hotels.filter(hotel =>
             hotel.address.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-        setFilteredHotels(filtered);
-        setLoading(false);
+        dispatch(setFilteredHotels(filtered));
+        dispatch(setLoading(false));
     };
 
     const getImageUrl = (pictureUrl) => {
@@ -88,7 +63,7 @@ const HotelList = () => {
                             type="text"
                             placeholder="Where are you going?"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                             style={{
                                 padding: '15px',
                                 width: '250px',
@@ -100,7 +75,7 @@ const HotelList = () => {
                         <input
                             type="date"
                             value={checkInDate}
-                            onChange={(e) => setCheckInDate(e.target.value)}
+                            onChange={(e) => dispatch(setCheckInDate(e.target.value))}
                             style={{
                                 padding: '15px',
                                 border: '1px solid #ccc',
@@ -111,7 +86,7 @@ const HotelList = () => {
                         <input
                             type="date"
                             value={checkOutDate}
-                            onChange={(e) => setCheckOutDate(e.target.value)}
+                            onChange={(e) => dispatch(setCheckOutDate(e.target.value))}
                             style={{
                                 padding: '15px',
                                 border: '1px solid #ccc',
@@ -123,7 +98,7 @@ const HotelList = () => {
                             value={`${guests.adults} adults · ${guests.children} children · ${guests.rooms} room`}
                             onChange={(e) => {
                                 const [adults, , children, , rooms] = e.target.value.split(' ');
-                                setGuests({ adults: parseInt(adults), children: parseInt(children), rooms: parseInt(rooms) });
+                                dispatch(setGuests({ adults: parseInt(adults), children: parseInt(children), rooms: parseInt(rooms) }));
                             }}
                             style={{
                                 padding: '15px',
